@@ -1,0 +1,92 @@
+[
+  {
+    "question": "Did the patient ever experience bradycardia?",
+    "query": "SELECT COUNT(*) > 0 AS has_bradycardia FROM heart_rate WHERE beats_per_min < 60;"
+  },
+  {
+  "question": "What was the maximum heart rate recorded for the patient, and when did it occur?",
+  "context": "Checking the maximum recorded heart rate and the hour at which it occurred, based on heart rate data.",
+  "query": "SELECT hour, beats_per_min AS max_heart_rate FROM heart_rate ORDER BY beats_per_min DESC LIMIT 1;"
+},
+  {
+     "question": "Did the patient have respiratory distress, and if so, during which hours?",
+     "query": "SELECT CASE WHEN COUNT(*) > 0 THEN 'Yes' ELSE 'No' END AS has_respiratory_distress, GROUP_CONCAT(hour) AS distress_hours FROM respiratory_rate WHERE breaths_per_min > 20;"
+
+  },
+  {
+    "question": "When did the patient experience a critical episode?",
+    "query": "SELECT hr.hour FROM heart_rate hr JOIN respiratory_rate rr ON hr.hour = rr.hour WHERE hr.beats_per_min > 110 AND rr.breaths_per_min > 25;"
+  },
+  {
+    "question": "When did the patient experience a heart rate spike?",
+    "query": "SELECT hour FROM heart_rate WHERE beats_per_min > 90;"
+  },
+  {
+    "question": "At what hour did the patient’s heart rate first exceed 100 bpm, indicating stress or physical activity?",
+    "query": "SELECT hour FROM heart_rate WHERE beats_per_min > 100 ORDER BY hour ASC LIMIT 1;"
+  },
+  {
+    "question": "When did the patient experience the largest increase in heart rate between consecutive hours?",
+    "query": "SELECT hour, (beats_per_min - LAG(beats_per_min) OVER (ORDER BY hour)) AS heart_rate_increase FROM heart_rate ORDER BY heart_rate_increase DESC LIMIT 1;"
+  },
+  {
+    "question": "At what hour did the patient’s respiratory rate peak?",
+    "query": "SELECT hour FROM respiratory_rate ORDER BY breaths_per_min DESC LIMIT 1;"
+  },
+  {
+    "question": "Did the patient ever experience episodes of both normal heart rate and high respiratory rate?",
+    "query": "SELECT hr.hour FROM heart_rate hr JOIN respiratory_rate rr ON hr.hour = rr.hour WHERE hr.beats_per_min BETWEEN 60 AND 100 AND rr.breaths_per_min > 25;"
+  },
+  {
+    "question": "At what hour did the patient have both normal heart and respiratory rates?",
+    "query": "SELECT hr.hour FROM heart_rate hr JOIN respiratory_rate rr ON hr.hour = rr.hour WHERE hr.beats_per_min BETWEEN 60 AND 80 AND rr.breaths_per_min BETWEEN 12 AND 20;"
+  },
+  {
+    "question": "When did the patient develop prolonged stress or cardiac strain?",
+    "query": "SELECT hr1.hour FROM heart_rate hr1 JOIN heart_rate hr2 ON hr1.hour + 1 = hr2.hour JOIN heart_rate hr3 ON hr1.hour + 2 = hr3.hour WHERE hr1.beats_per_min > 110 AND hr2.beats_per_min > 110 AND hr3.beats_per_min > 110;"
+  },
+  {
+    "question": "Did the patient experience Hypoventilation?",
+    "query": "SELECT hr.hour FROM heart_rate hr JOIN respiratory_rate rr ON hr.hour = rr.hour WHERE hr.beats_per_min > 100 AND rr.breaths_per_min < 12;"
+  },
+  {
+    "question": "Did the patient have both normal heart rate and respiratory rate?",
+    "query": "SELECT hr.hour FROM heart_rate hr JOIN respiratory_rate rr ON hr.hour = rr.hour WHERE hr.beats_per_min BETWEEN 60 AND 80 AND rr.breaths_per_min BETWEEN 12 AND 20;"
+  },
+  {
+    "question": "Did the patient ever have a normal heart rate?",
+    "query": "SELECT hour FROM heart_rate WHERE beats_per_min BETWEEN 60 AND 80;"
+  },
+  {
+    "question": "Did the patient ever have a normal respiratory rate?",
+    "query": "SELECT hour FROM respiratory_rate WHERE breaths_per_min BETWEEN 12 AND 20;"
+  },
+  {
+    "question": "During which hours did the patient maintain stable conditions (heart rate and respiratory rate within normal ranges)?",
+    "query": "SELECT hr.hour FROM heart_rate hr JOIN respiratory_rate rr ON hr.hour = rr.hour WHERE hr.beats_per_min BETWEEN 60 AND 80 AND rr.breaths_per_min BETWEEN 12 AND 20 ORDER BY hr.hour;"
+  },
+  {
+    "question": "When was the patient in a resting condition (heart rate near 60 and respiratory rate near 12)?",
+    "query": "SELECT hr.hour FROM heart_rate hr JOIN respiratory_rate rr ON hr.hour = rr.hour WHERE hr.beats_per_min BETWEEN 60 AND 65 AND rr.breaths_per_min BETWEEN 12 AND 14;"
+  },
+  {
+    "question": "Did the patient show signs of mild physical activity (heart rate between 70 and 80, respiratory rate between 16 and 20)?",
+    "query": "SELECT hr.hour FROM heart_rate hr JOIN respiratory_rate rr ON hr.hour = rr.hour WHERE hr.beats_per_min BETWEEN 70 AND 80 AND rr.breaths_per_min BETWEEN 16 AND 20;"
+  },
+  {
+    "question": "During which hours did the patient engage in moderate physical activity (heart rate between 80 and 90, respiratory rate between 20 and 25)?",
+    "query": "SELECT hr.hour FROM heart_rate hr JOIN respiratory_rate rr ON hr.hour = rr.hour WHERE hr.beats_per_min BETWEEN 80 AND 90 AND rr.breaths_per_min BETWEEN 20 AND 25;"
+  },
+  {
+    "question": "During which hours did the patient have a normal respiratory rate but a slightly elevated heart rate (heart rate 80-90 bpm, respiratory rate 12-20)?",
+    "query": "SELECT hr.hour FROM heart_rate hr JOIN respiratory_rate rr ON hr.hour = rr.hour WHERE hr.beats_per_min BETWEEN 80 AND 90 AND rr.breaths_per_min BETWEEN 12 AND 20;"
+  },
+  {
+    "question": "Did the patient maintain normal heart rate and respiratory rate for an extended period (consecutive normal readings)?",
+    "query": "SELECT hr.hour FROM heart_rate hr JOIN respiratory_rate rr ON hr.hour = rr.hour WHERE hr.beats_per_min BETWEEN 60 AND 80 AND rr.breaths_per_min BETWEEN 12 AND 20 ORDER BY hr.hour LIMIT 5;"
+  },
+  {
+    "question": "During which hours did the patient maintain generally normal conditions with slight variations (heart rate between 60-85, respiratory rate between 12-22)?",
+    "query": "SELECT hr.hour FROM heart_rate hr JOIN respiratory_rate rr ON hr.hour = rr.hour WHERE hr.beats_per_min BETWEEN 60 AND 85 AND rr.breaths_per_min BETWEEN 12 AND 22;"
+  }
+]
